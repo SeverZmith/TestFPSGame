@@ -52,7 +52,7 @@ void AFirstPersonCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	if (GunBlueprint == NULL)
+	if (GunBlueprint == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GunBlueprint Missing!"))
 		return;
@@ -61,7 +61,7 @@ void AFirstPersonCharacter::BeginPlay()
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
-	Gun->AnimInstance = Mesh1P->GetAnimInstance();
+	Gun->AnimInstance1P = Mesh1P->GetAnimInstance();
 
 	// Bind fire event
 	InputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
