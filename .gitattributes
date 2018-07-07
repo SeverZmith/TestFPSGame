@@ -1,4 +1,0 @@
-Content/Static/Geometry/** filter=lfs diff=lfs merge=lfs -text
-Content/Static/NPC/** filter=lfs diff=lfs merge=lfs -text
-Content/Static/Player/** filter=lfs diff=lfs merge=lfs -text
-Content/Static/Weapons/** filter=lfs diff=lfs merge=lfs -text
