@@ -81,7 +81,6 @@ void AMannequin::UnPossessed()
 
 	if (Gun == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Gun is not available."));
 		return;
 	}
 	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint_0"));
