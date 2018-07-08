@@ -6,6 +6,44 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+USTRUCT(BlueprintType)
+struct FSpawnPosition
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	float Rotation;
+
+	UPROPERTY()
+	float Scale;
+
+	UPROPERTY()
+	FVector Location;
+
+};
+
+USTRUCT(BlueprintType)
+struct FSpawnCustomizations
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	int32 MinSpawn = 1;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	int32 MaxSpawn = 1;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	float MinScale = 1.f;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	float MaxScale = 1.f;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	float Radius = 500.f;
+
+};
+
 class UActorPool;
 
 UCLASS()
@@ -20,8 +58,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, int32 MinSpawn = 1, int32 MaxSpawn = 1, float Radius = 500.f, float MinScale = 1, float MaxScale = 1);
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnCustomizations Details);
+
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FSpawnCustomizations Details);
 
 	UFUNCTION(BlueprintCallable, Category = "Pool")
 	void SetPool(UActorPool* Pool);
@@ -44,9 +85,15 @@ protected:
 private:
 	void PositionNavMeshBoundsVolume();
 
+	TArray<FSpawnPosition> RandomSpawnPositions(int32 MinSpawn, int32 MaxSpawn, float Radius, float MinScale, float MaxScale);
+
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
 
-	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float Rotation, float Scale);
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition);
+
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 	
