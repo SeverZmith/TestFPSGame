@@ -15,15 +15,21 @@ UActorPool::UActorPool()
 
 AActor* UActorPool::Checkout()
 {
-	return nullptr;
+	if (Pool.Num() == 0)
+	{
+		return nullptr;
+	}
+	return Pool.Pop();
 }
 
 void UActorPool::Retrieve(AActor* ActorToRetrieve)
 {
+	Add(ActorToRetrieve);
 
 }
 
 void UActorPool::Add(AActor* ActorToAdd)
 {
+	Pool.Push(ActorToAdd);
 
 }
