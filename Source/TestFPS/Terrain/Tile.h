@@ -85,20 +85,24 @@ protected:
 private:
 	void PositionNavMeshBoundsVolume();
 
-	TArray<FSpawnPosition> RandomSpawnPositions(int32 MinSpawn, int32 MaxSpawn, float Radius, float MinScale, float MaxScale);
+	// TArray<FSpawnPosition> RandomSpawnPositions(int32 MinSpawn, int32 MaxSpawn, float Radius, float MinScale, float MaxScale);
 
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
 
-	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	template<class T>
+	void RandomlyPlaceActors(TSubclassOf<T> ToSpawn, FSpawnCustomizations Details);
+
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition);
 
-	UFUNCTION(BlueprintCallable, Category = "Spawn")
-	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
+	void PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 	
 	UActorPool* Pool;
 
 	AActor* NavMeshBoundsVolume;
+
+	//Holds the actors created in the tile and destroys them when the tile is destroyed
+	TArray<AActor *> ActorsInTile;
 
 };
