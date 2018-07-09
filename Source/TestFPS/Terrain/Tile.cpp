@@ -51,12 +51,11 @@ void ATile::BeginPlay()
 
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (NavMeshBoundsVolume == nullptr)
+	if (Pool != nullptr && NavMeshBoundsVolume != nullptr)
 	{
-		return;
+		Pool->Retrieve(NavMeshBoundsVolume);
 	}
 
-	Pool->Retrieve(NavMeshBoundsVolume);
 	if (ActorsInTile.Num() != 0)
 	{
 		AActor* Prop;
@@ -139,13 +138,12 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition
 
 void ATile::PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition)
 {
-	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	FRotator Rotation = FRotator(0, SpawnPosition.Rotation, 0);
+	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(ToSpawn, SpawnPosition.Location, Rotation);
 	if (SpawnedPawn)
 	{
 		ActorsInTile.Add(SpawnedPawn);
-		SpawnedPawn->SetActorRelativeLocation(SpawnPosition.Location);
 		SpawnedPawn->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-		SpawnedPawn->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
 		SpawnedPawn->SpawnDefaultController();
 		SpawnedPawn->Tags.Add(FName("Enemy"));
 	}
