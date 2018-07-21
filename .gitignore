@@ -13,4 +13,4 @@ Saved
 *.xcodeproj
 *.xcworkspace
 Content/Dynamic/Levels/FirstPersonExampleMap_BuiltData.uasset
-Content/Static/TestingGroundPack/
+# Content/Static/TestingGroundPack/
