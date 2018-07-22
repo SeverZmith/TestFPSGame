@@ -36,10 +36,8 @@ class TESTFPS_API AGun : public AActor
 	class UMotionControllerComponent* L_MotionController;
 
 public:	
-	// Sets default values for this actor's properties
 	AGun();
 
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	/** Fires a projectile. */
@@ -73,7 +71,10 @@ public:
 	uint32 bUsingMotionControllers : 1;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+// Inline Functions
+public:
+	FORCEINLINE USceneComponent* GetFPMuzzleLocation() const { return FP_MuzzleLocation; };
 
 };

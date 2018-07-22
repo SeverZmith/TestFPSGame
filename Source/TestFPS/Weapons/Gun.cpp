@@ -7,7 +7,7 @@
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 
-// Sets default values
+
 AGun::AGun()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -51,7 +51,6 @@ AGun::AGun()
 
 }
 
-// Called when the game starts or when spawned
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
@@ -72,7 +71,6 @@ void AGun::BeginPlay()
 
 }
 
-// Called every frame
 void AGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -92,37 +90,43 @@ void AGun::OnFire()
 				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
 				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
 				World->SpawnActor<ABallProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+
 			}
 			else
 			{
 				const FRotator SpawnRotation = FP_MuzzleLocation->GetComponentRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 				const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
 
-				//Set Spawn Collision Handling Override
+				// Set Spawn Collision Handling Override.
 				FActorSpawnParameters ActorSpawnParams;
 				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-				// spawn the projectile at the muzzle
+				// Spawn the projectile at the muzzle.
 				World->SpawnActor<ABallProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
 			}
+
 		}
+
 	}
 
-	// try and play the sound if specified
+	// Try and play the sound if specified.
 	if (FireSound != nullptr)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+
 	}
 
-	// try and play a firing animation if FireAnim & AnimInstance are specified
+	// Try and play a firing animation if FireAnim & AnimInstance are specified.
 	if (FireAnimation1P != nullptr && AnimInstance1P != nullptr)
 	{
 		AnimInstance1P->Montage_Play(FireAnimation1P, 1.f);
+
 	}
 	if (FireAnimation3P != nullptr && AnimInstance3P != nullptr)
 	{
 		AnimInstance3P->Montage_Play(FireAnimation3P, 1.f);
+
 	}
 
 }

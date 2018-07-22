@@ -48,23 +48,20 @@ AFirstPersonCharacter::AFirstPersonCharacter()
 }
 
 void AFirstPersonCharacter::BeginPlay()
-{
-	// Call the base class  
+{ 
 	Super::BeginPlay();
 
 	if (GunBlueprint == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GunBlueprint Missing!"))
 		return;
+
 	}
 	Gun = GetWorld()->SpawnActor<AGun>(GunBlueprint);
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	Gun->AnimInstance1P = Mesh1P->GetAnimInstance();
-
-	// Bind fire event
-	InputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
 
 }
 
@@ -75,6 +72,9 @@ void AFirstPersonCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 {
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
+
+	// Bind fire event
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, Gun, &AGun::OnFire);
 
 	// Bind jump events
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
@@ -96,11 +96,13 @@ void AFirstPersonCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("TurnRate", this, &AFirstPersonCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AFirstPersonCharacter::LookUpAtRate);
+
 }
 
 void AFirstPersonCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+
 }
 
 void AFirstPersonCharacter::BeginTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -108,15 +110,18 @@ void AFirstPersonCharacter::BeginTouch(const ETouchIndex::Type FingerIndex, cons
 	if (TouchItem.bIsPressed == true)
 	{
 		return;
+
 	}
 	if ((FingerIndex == TouchItem.FingerIndex) && (TouchItem.bMoved == false))
 	{
 		// OnFire();
+
 	}
 	TouchItem.bIsPressed = true;
 	TouchItem.FingerIndex = FingerIndex;
 	TouchItem.Location = Location;
 	TouchItem.bMoved = false;
+
 }
 
 void AFirstPersonCharacter::EndTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -124,8 +129,10 @@ void AFirstPersonCharacter::EndTouch(const ETouchIndex::Type FingerIndex, const 
 	if (TouchItem.bIsPressed == false)
 	{
 		return;
+
 	}
 	TouchItem.bIsPressed = false;
+
 }
 
 //Commenting this section out to be consistent with FPS BP template.
@@ -172,7 +179,9 @@ void AFirstPersonCharacter::MoveForward(float Value)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), Value);
+
 	}
+
 }
 
 void AFirstPersonCharacter::MoveRight(float Value)
@@ -181,19 +190,23 @@ void AFirstPersonCharacter::MoveRight(float Value)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), Value);
+
 	}
+
 }
 
 void AFirstPersonCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+
 }
 
 void AFirstPersonCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+
 }
 
 bool AFirstPersonCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)
@@ -206,7 +219,8 @@ bool AFirstPersonCharacter::EnableTouchscreenMovement(class UInputComponent* Pla
 		//Commenting this out to be more consistent with FPS BP template.
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AFirstPersonCharacter::TouchUpdate);
 		return true;
+
 	}
-	
 	return false;
+
 }

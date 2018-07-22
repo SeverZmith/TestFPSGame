@@ -6,9 +6,7 @@
 #include "TestFPSGameMode.h"
 #include "InfiniteTerrainGameMode.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class TESTFPS_API AInfiniteTerrainGameMode : public ATestFPSGameMode
 {

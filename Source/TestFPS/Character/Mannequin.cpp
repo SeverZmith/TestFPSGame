@@ -1,20 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-// #include "TestFPS.h" TODO verify this line can be removed
 #include "Mannequin.h"
+#include "Engine/World.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "GameFramework/InputSettings.h"
 #include "../Weapons/Gun.h"
+#include "DrawDebugHelpers.h"
 
 
-// Sets default values
 AMannequin::AMannequin()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -30,9 +29,9 @@ AMannequin::AMannequin()
 	Mesh1P->CastShadow = false;
 	Mesh1P->RelativeRotation = FRotator(1.9f, -19.19f, 5.2f);
 	Mesh1P->RelativeLocation = FVector(-0.5f, -4.4f, -155.7f);
+
 }
 
-// Called when the game starts or when spawned
 void AMannequin::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,6 +40,7 @@ void AMannequin::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Gun blueprint missing."));
 		return;
+
 	}
 	Gun = GetWorld()->SpawnActor<AGun>(GunBlueprint);
 
@@ -48,35 +48,39 @@ void AMannequin::BeginPlay()
 	if (IsPlayerControlled())
 	{
 		Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+
 	}
 	else
 	{
 		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint_0"));
+
 	}
 
+	// Set anim instances for first person and third person.
 	Gun->AnimInstance1P = Mesh1P->GetAnimInstance();
 	Gun->AnimInstance3P = GetMesh()->GetAnimInstance();
+
 }
 
 void AMannequin::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Gun->Destroy();
+
 }
 
-// Called every frame
 void AMannequin::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
 void AMannequin::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (PlayerInputComponent != nullptr)
 	{
+		// Bind fire event
 		PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMannequin::PullTrigger);
 
 		// Bind jump events
@@ -99,6 +103,7 @@ void AMannequin::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		PlayerInputComponent->BindAxis("TurnRate", this, &AMannequin::TurnAtRate);
 		PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 		PlayerInputComponent->BindAxis("LookUpRate", this, &AMannequin::LookUpAtRate);
+
 	}
 
 }
@@ -110,7 +115,9 @@ void AMannequin::UnPossessed()
 	if (Gun == nullptr)
 	{
 		return;
+
 	}
+	// This prevents the Gun mesh from disappearing when player dies.
 	Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint_0"));
 
 }
@@ -119,10 +126,43 @@ void AMannequin::PullTrigger()
 {
 	if (Gun == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No Gun Equipped! -- AMannequin::Fire()"))
+		UE_LOG(LogTemp, Warning, TEXT("No Gun Equipped! -- AMannequin::Fire()"));
 		return;
+
 	}
+
 	Gun->OnFire();
+
+}
+
+void AMannequin::DrawLineTraceEx()
+{
+	// Future implementations of shooting will use line traces to improve projectile flight logic.
+	FHitResult OutHit;
+	FVector Start = Gun->GetFPMuzzleLocation()->GetComponentLocation();
+	FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
+	FVector End = (Start + (ForwardVector * 1000.f));
+
+	FCollisionQueryParams CollisionParams;
+
+	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
+
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
+
+	if (IsHit)
+	{
+		if (OutHit.bBlockingHit)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("You are hitting: %s: "), *OutHit.GetActor()->GetName());
+
+			UE_LOG(LogTemp, Warning, TEXT("Impact Point: %s: "), *OutHit.ImpactPoint.ToString());
+
+			UE_LOG(LogTemp, Warning, TEXT("Normal Point: %s: "), *OutHit.ImpactNormal.ToString());
+
+		}
+
+	}
+
 }
 
 /////////////////////////////////////////////////////////////
@@ -132,6 +172,7 @@ void AMannequin::PullTrigger()
 void AMannequin::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+
 }
 
 void AMannequin::BeginTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -139,15 +180,18 @@ void AMannequin::BeginTouch(const ETouchIndex::Type FingerIndex, const FVector L
 	if (TouchItem.bIsPressed == true)
 	{
 		return;
+
 	}
 	if ((FingerIndex == TouchItem.FingerIndex) && (TouchItem.bMoved == false))
 	{
 		// OnFire();
+
 	}
 	TouchItem.bIsPressed = true;
 	TouchItem.FingerIndex = FingerIndex;
 	TouchItem.Location = Location;
 	TouchItem.bMoved = false;
+
 }
 
 void AMannequin::EndTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -155,8 +199,10 @@ void AMannequin::EndTouch(const ETouchIndex::Type FingerIndex, const FVector Loc
 	if (TouchItem.bIsPressed == false)
 	{
 		return;
+
 	}
 	TouchItem.bIsPressed = false;
+
 }
 
 void AMannequin::MoveForward(float Value)
@@ -165,7 +211,9 @@ void AMannequin::MoveForward(float Value)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), Value);
+
 	}
+
 }
 
 void AMannequin::MoveRight(float Value)
@@ -174,19 +222,23 @@ void AMannequin::MoveRight(float Value)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), Value);
+
 	}
+
 }
 
 void AMannequin::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+
 }
 
 void AMannequin::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+
 }
 
 bool AMannequin::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)
@@ -199,7 +251,9 @@ bool AMannequin::EnableTouchscreenMovement(class UInputComponent* PlayerInputCom
 		//Commenting this out to be more consistent with FPS BP template.
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AFirstPersonCharacter::TouchUpdate);
 		return true;
+
 	}
 
 	return false;
+
 }

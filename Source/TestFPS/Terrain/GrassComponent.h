@@ -11,10 +11,8 @@ class TESTFPS_API UGrassComponent : public UHierarchicalInstancedStaticMeshCompo
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	UGrassComponent();
 
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditDefaultsOnly, Category = Spawning)
@@ -24,7 +22,6 @@ public:
 	int SpawnCount;
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:

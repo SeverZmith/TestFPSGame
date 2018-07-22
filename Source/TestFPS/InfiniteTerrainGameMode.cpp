@@ -7,21 +7,27 @@
 
 AInfiniteTerrainGameMode::AInfiniteTerrainGameMode()
 {
+	// Create actor pool
 	NavMeshBoundsVolumePool = CreateDefaultSubobject<UActorPool>(FName("Nav Mesh Bounds Volume Pool"));
+
 }
 
 void AInfiniteTerrainGameMode::PopulateBoundsVolumePool()
 {
+	// Create iterator for actor pool
 	auto NavMeshVolumeIterator = TActorIterator<ANavMeshBoundsVolume>(GetWorld());
 	while (NavMeshVolumeIterator)
 	{
 		AddToPool(*NavMeshVolumeIterator);
 		++NavMeshVolumeIterator;
+
 	}
+
 }
 
 void AInfiniteTerrainGameMode::AddToPool(ANavMeshBoundsVolume *VolumeToAdd)
 {
+	// Add volume to pool
 	NavMeshBoundsVolumePool->Add(VolumeToAdd);
 
 }

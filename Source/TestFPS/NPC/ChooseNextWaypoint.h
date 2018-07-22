@@ -6,9 +6,7 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "ChooseNextWaypoint.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class TESTFPS_API UChooseNextWaypoint : public UBTTaskNode
 {

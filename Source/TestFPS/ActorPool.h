@@ -13,13 +13,15 @@ class TESTFPS_API UActorPool : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UActorPool();
 	
+	// Pop actor from pool
 	AActor* Checkout();
 
+	// Add actor to push
 	void Retrieve(AActor* ActorToRetrieve);
 
+	// Push actor to pool
 	void Add(AActor* ActorToAdd);
 
 private:
